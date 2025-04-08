@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;//allows us to automatically generate id
 import jakarta.persistence.GenerationType;//specifies id generation strategy
 import jakarta.persistence.Id;
+import org.hibernate.annotations.Formula;
 
 @Entity//tells spring that this class represent database table
 public class Employee {
@@ -13,9 +14,13 @@ public class Employee {
     private String name;
     private String department;
     private String username;
-    private String password;
-    private String roles;
+   // private String password;
+   // private String roles;
+    private String encryptedPassword; // Store the encrypted password
 
+    @Formula(value = "CAST(AES_DECRYPT(encrypted_password, 'your-encryption-password-here') AS CHAR(255))")
+    private String password; // Virtual field for decrypted password (use with caution)
+    private String roles;
     // Constructors, getters, setters
     public Employee(){}//default constructor used by spring & hibernate
 
@@ -33,6 +38,9 @@ public class Employee {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getEncryptedPassword() { return encryptedPassword; }
+    public void setEncryptedPassword(String encryptedPassword) { this.encryptedPassword = encryptedPassword; }
 
     public String getRoles() { return roles; }
     public void setRoles(String roles) { this.roles = roles; }

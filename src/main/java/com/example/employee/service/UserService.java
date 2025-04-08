@@ -2,6 +2,7 @@ package com.example.employee.service;
 
 import com.example.employee.entity.Employee;
 import com.example.employee.repository.EmployeeRepository;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +12,19 @@ public class UserService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    private final StrongTextEncryptor textEncryptor;
+
+    public UserService() {
+        textEncryptor = new StrongTextEncryptor();
+        textEncryptor.setPassword("your-encryption-password-here"); // Same password as in application.properties
+    }
+
     public String registerEmployee(Employee employee) {
         employee.setRoles("USER");
-        // Password will be stored as is (no encoding for now)
+        String encryptedPassword = textEncryptor.encrypt(employee.getPassword());
+        employee.setEncryptedPassword(encryptedPassword);
+        // We are now saving the encrypted password
+        employee.setPassword(null); // It's good practice to nullify the plain text password
         employeeRepository.save(employee);
         return "Employee registered successfully!";
     }

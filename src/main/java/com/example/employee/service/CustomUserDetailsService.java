@@ -2,6 +2,7 @@ package com.example.employee.service;
 
 import com.example.employee.entity.Employee;
 import com.example.employee.repository.EmployeeRepository;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,25 +21,32 @@ public class CustomUserDetailsService implements UserDetailsService {
     //Creates a logger
     @Autowired//injects dependency of employeerepository
     private EmployeeRepository employeeRepository;
+    private final StrongTextEncryptor textEncryptor;
+
+    public CustomUserDetailsService() {
+        textEncryptor = new StrongTextEncryptor();
+        textEncryptor.setPassword("your-encryption-password-here"); // Same password as in application.properties
+    }
 
     @Override//overrides the loaduserbyusername method
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("Attempting to load user: {}", username);//logs the username being loaded
-        Optional<Employee> employee = employeeRepository.findByUsername(username);//Finds employee by username
+        Optional<Employee> employeeOptional = employeeRepository.findByUsername(username);//Finds employee by username
 
-        if (employee.isEmpty()) {
-            logger.warn("User not found: {}", username);//Logs a warning if user not found
+        if (employeeOptional.isEmpty()) {
+            logger.warn("User not found: {}", username);
             throw new UsernameNotFoundException("User not found");
         }
 
-        Employee emp = employee.get();
-
+        Employee emp = employeeOptional.get();
+        String decryptedPassword = textEncryptor.decrypt(emp.getEncryptedPassword());
         logger.info("User found: {}", emp.getUsername());
         logger.info("User roles: {}", emp.getRoles());
-        logger.info("Password from database: {}", emp.getPassword()); // Add this line
+        logger.info("Password from database (encrypted): {}", emp.getEncryptedPassword()); // Log encrypted password
+        logger.info("Password after decryption: {}", decryptedPassword); // Log decrypted password
 
         return User.withUsername(emp.getUsername())
-                .password(emp.getPassword())//sets the password
+                .password(decryptedPassword) // Use the decrypted password for authentication
                 .roles(emp.getRoles().split(","))//set the roles
                 .build();
     }
