@@ -29,7 +29,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {//to encode password
         return NoOpPasswordEncoder.getInstance();
-    }
+   }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //configures which requests require are allowed and which require authentication
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                                .requestMatchers("get/employees").authenticated()
                         //allows anyone to access login and register without logging in
                         .anyRequest().authenticated()
                         //tells all other requests to your app require authentication
@@ -56,7 +57,8 @@ public class SecurityConfig {
                 //JWT handles client side
                 .httpBasic(Customizer.withDefaults())
                 //enables basic auth for testing purpose
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter
+                        , UsernamePasswordAuthenticationFilter.class);
         //tells spring security to run jwtRequestFilter before the standard username and pwd auth filter
         //this means it will check the JWT token first
 
