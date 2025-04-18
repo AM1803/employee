@@ -4,8 +4,7 @@ import com.example.employee.security.JwtUtil;
 import com.example.employee.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,15 +36,19 @@ public class AuthenticationController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-        } catch (Exception ex) {
-            return ResponseEntity.status(401).body("Invalid credentials!");
         }
-
+        catch (BadCredentialsException ex) {
+            throw ex; // In global exception handler to give 401 for invalid credentials
+        } catch (DisabledException ex) {
+            throw ex; //In GlobalExceptionHandler for diqabled accounts trying to log in
+        } catch (LockedException ex) {
+            throw ex; // In GlobalExceptionHandler for locked accounts
+        } catch (Exception ex) {
+            throw ex; // Let GlobalExceptionHandler handle this
+        }
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(username);
-
         final String jwt = jwtUtil.generateToken(userDetails);
-
         return ResponseEntity.ok(Map.of("token", jwt));
     }
 }

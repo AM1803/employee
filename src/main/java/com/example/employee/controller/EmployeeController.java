@@ -1,42 +1,62 @@
-// emp_controller.java
+// src/main/java/com/example/employee/controller/EmployeeController.java
 package com.example.employee.controller;
 
 import com.example.employee.entity.Employee;
+import com.example.employee.Exception.ResourceNotFoundException;
 import com.example.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@RestController//rest controller to handle web requests
-@RequestMapping("/employees")//sets the base url for all methods in this controller to /employees
+import java.util.List;
+import java.util.NoSuchElementException;
+
+@RestController
+@RequestMapping("/employees")
 public class EmployeeController {
 
-    @Autowired//injects an instance of employee service
-    private EmployeeService employeeService;//to use employee service
+    @Autowired
+    private EmployeeService employeeService;
 
-    @GetMapping//handles all the get requests to /employees(eg-to get all employees)
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();//calls the service to get all employees
+    @GetMapping
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        return ResponseEntity.ok(employees);
     }
 
-    @GetMapping("/{id}")//handles get requests by /{id}(eg- get employees by id)
-    public Employee getEmployeeById(@PathVariable Long id) {//extracts id from the url
-        return employeeService.getEmployeeById(id);//calls service to get employee by id
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee == null) {
+            throw new ResourceNotFoundException("Employee with ID " + id + " not found");
+        }
+        return ResponseEntity.ok(employee);
     }
 
-    @PostMapping//handles post request to employees(eg- to create a new employee detail)
-    public Employee createEmployee(@RequestBody Employee employee) {//extracts data from request body
-        return employeeService.createEmployee(employee);//calls the service to create an employee
+    @PostMapping
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        Employee createdEmployee = employeeService.createEmployee(employee);
+        return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")//handles put request by /employees/{id}(eg-to update employee)
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {//extracts id and emp data
-        return employeeService.updateEmployee(id, employee);//calls service to update emp data
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+        Employee updatedEmployee = employeeService.updateEmployee(id, employee);
+        if (updatedEmployee == null) {
+            throw new ResourceNotFoundException("Employee with ID " + id + " not found for update");
+        }
+        return ResponseEntity.ok(updatedEmployee);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id) {//extracts id from employee
-        employeeService.deleteEmployee(id);//calls service to delete employee
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        try {
+            employeeService.deleteEmployee(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (NoSuchElementException ex) {
+            throw new ResourceNotFoundException("Employee with ID " + id + " not found for deletion");
+        }
     }
 }
 

@@ -16,15 +16,17 @@ public class UserService {
 
     public UserService() {
         textEncryptor = new StrongTextEncryptor();
-        textEncryptor.setPassword("your-encryption-password-here"); // Same password as in application.properties
+        textEncryptor.setPassword("technology"); // Same password as in application.properties
     }
 
     public String registerEmployee(Employee employee) {
-        employee.setRoles("USER");
+        // Set a default role of "USER" only if no role is provided during registration
+        if (employee.getRoles() == null || employee.getRoles().isEmpty()) {
+            employee.setRoles("USER");
+        }
         String encryptedPassword = textEncryptor.encrypt(employee.getPassword());
         employee.setEncryptedPassword(encryptedPassword);
-        // We are now saving the encrypted password
-        employee.setPassword(null); // It's good practice to nullify the plain text password
+        employee.setPassword(null);
         employeeRepository.save(employee);
         return "Employee registered successfully!";
     }

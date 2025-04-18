@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-    private final String secret = "your-secret-key"; // Used to sign and verify jwt
+    private final String secret = "1001"; // Used to sign and verify jwt
     private final long validityTime = 3600000;
     // 1 hour in milliseconds will be the validity of a generated jwt
 

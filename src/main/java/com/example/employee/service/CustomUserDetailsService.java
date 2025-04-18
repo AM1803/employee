@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public CustomUserDetailsService() {
         textEncryptor = new StrongTextEncryptor();
-        textEncryptor.setPassword("your-encryption-password-here"); // Same password as in application.properties
+        textEncryptor.setPassword("technology"); // Same password as in application.properties
     }
 
     @Override//overrides the loaduserbyusername method
