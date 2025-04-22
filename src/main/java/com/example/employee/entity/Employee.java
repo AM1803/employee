@@ -19,7 +19,7 @@ public class Employee {
    // private String encryptedPassword; // Store the encrypted password
 
     @Formula(value = "CAST(AES_DECRYPT(password, 'technology') AS CHAR(255))")
-    private String password; // Virtual field for decrypted password (use with caution)
+    private String password;  // Virtual field for decrypted password (use with caution)
     private String roles;
     // Constructors, getters, setters
     public Employee(){}//default constructor used by spring & hibernate
