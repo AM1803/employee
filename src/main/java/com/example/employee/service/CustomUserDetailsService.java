@@ -39,10 +39,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         Employee emp = employeeOptional.get();
-        String decryptedPassword = textEncryptor.decrypt(emp.getEncryptedPassword());
+        String decryptedPassword = textEncryptor.decrypt(emp.getPassword());
         logger.info("User found: {}", emp.getUsername());
         logger.info("User roles: {}", emp.getRoles());
-        logger.info("Password from database (encrypted): {}", emp.getEncryptedPassword()); // Log encrypted password
+        logger.info("Password from database (encrypted): {}", emp.getPassword()); // Log encrypted password
         logger.info("Password after decryption: {}", decryptedPassword); // Log decrypted password
 
         return User.withUsername(emp.getUsername())

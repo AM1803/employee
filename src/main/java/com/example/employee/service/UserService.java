@@ -25,8 +25,8 @@ public class UserService {
             employee.setRoles("USER");
         }
         String encryptedPassword = textEncryptor.encrypt(employee.getPassword());
-        employee.setEncryptedPassword(encryptedPassword);
-        employee.setPassword(null);
+        employee.setPassword(encryptedPassword);
+        //employee.setPassword(null);
         employeeRepository.save(employee);
         return "Employee registered successfully!";
     }

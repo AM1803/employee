@@ -16,9 +16,9 @@ public class Employee {
     private String username;
    // private String password;
    // private String roles;
-    private String encryptedPassword; // Store the encrypted password
+   // private String encryptedPassword; // Store the encrypted password
 
-    @Formula(value = "CAST(AES_DECRYPT(encrypted_password, 'your-encryption-password-here') AS CHAR(255))")
+    @Formula(value = "CAST(AES_DECRYPT(password, 'technology') AS CHAR(255))")
     private String password; // Virtual field for decrypted password (use with caution)
     private String roles;
     // Constructors, getters, setters
@@ -39,8 +39,8 @@ public class Employee {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getEncryptedPassword() { return encryptedPassword; }
-    public void setEncryptedPassword(String encryptedPassword) { this.encryptedPassword = encryptedPassword; }
+    //public String getEncryptedPassword() { return encryptedPassword; }
+  //  public void setEncryptedPassword(String encryptedPassword) { this.encryptedPassword = encryptedPassword; }
 
     public String getRoles() { return roles; }
     public void setRoles(String roles) { this.roles = roles; }
